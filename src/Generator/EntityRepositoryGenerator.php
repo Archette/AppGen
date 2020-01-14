@@ -6,7 +6,9 @@ namespace Archette\AppGen\Generator;
 
 use Archette\AppGen\Command\Model\CreateModelResult;
 use Archette\AppGen\Config\AppGenConfig;
+use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\Type;
 use Nette\Utils\Strings;
@@ -64,30 +66,46 @@ class EntityRepositoryGenerator
 		$get->setVisibility(ClassType::VISIBILITY_PUBLIC)
 			->addComment('@throws ' . $input->getNotFoundExceptionClass());
 
-		foreach ($this->createGetByBody($input->getEntityClass(), 'id') as $code) {
+		foreach ($this->createGetByBody($input->getEntityClass(), 'id', 'id') as $code) {
 			$get->addBody($code);
 		}
 
-		foreach ($input->getGetByMethods() as $fieldName => $fieldType) {
-			$method = $class->addMethod('getBy' . Strings::firstUpper($fieldName));
-			$method->addParameter($fieldName)
-				->setType(Strings::contains(strtolower($fieldType), 'uuid') ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
+		$commonGetByMethod = function (DoctrineEntityProperty $property, string $parameterName, bool $all = false) use ($class): Method {
+			$method = $class->addMethod('get' . ($all ? 'All' : '') . 'By' . Strings::firstUpper($property->getName()));
+			$method->addParameter($parameterName)
+				->setType($property->getRelation() === null ? $property->getType() : (Strings::contains($this->config->model->entity->idType, 'uuid') ? 'Ramsey\Uuid\UuidInterface' : Type::INT));
+
+			return $method;
+		};
+
+		foreach ($input->getGetByMethods() as $property) {
+			$parameterName = Strings::firstLower($property->getName());
+			if ($property->getRelation() !== null) {
+				$parameterName = $parameterName . 'Id';
+			}
+
+			$method = $commonGetByMethod($property, $parameterName);
 			$method->setReturnType($input->getEntityClass(true));
 			$method->setVisibility(ClassType::VISIBILITY_PUBLIC)
 				->addComment('@throws ' . $input->getNotFoundExceptionClass());
-			foreach ($this->createGetByBody($input->getEntityClass(), $fieldName) as $code) {
+
+			foreach ($this->createGetByBody(Strings::firstLower($input->getEntityClass()), Strings::firstLower($property->getName()), $parameterName) as $code) {
 				$method->addBody($code);
 			}
 		}
 
-		foreach ($input->getGetAllByMethods() as $fieldName => $fieldType) {
-			$method = $class->addMethod('getAllBy' . Strings::firstUpper($fieldName));
-			$method->addParameter($fieldName)
-				->setType(Strings::contains(strtolower($fieldType), 'uuid') ? 'Ramsey\Uuid\UuidInterface' : $fieldType);
+		foreach ($input->getGetAllByMethods() as $property) {
+			$parameterName = Strings::firstLower($property->getName());
+			if ($property->getRelation() !== null) {
+				$parameterName = $parameterName . 'Id';
+			}
+
+			$method = $commonGetByMethod($property, $parameterName, true);
 			$method->setReturnType(Type::ARRAY);
 			$method->setVisibility(ClassType::VISIBILITY_PUBLIC)
 				->addComment('@return ' . $input->getEntityClass() . '[]');
-			foreach ($this->createGetAllByBody($fieldName) as $code) {
+
+			foreach ($this->createGetAllByBody(Strings::firstLower($property->getName()), $parameterName) as $code) {
 				$method->addBody($code);
 			}
 		}
@@ -110,30 +128,30 @@ class EntityRepositoryGenerator
 		return (string) $file;
 	}
 
-	private function createGetByBody(string $entityName, string $fieldName): array
+	private function createGetByBody(string $entityName, string $columnName, string $fieldName): array
 	{
 		$code = [];
 
-		$code[] = '/** @var ' . $entityName . ' $' . Strings::firstLower($entityName) . ' */';
-		$code[] = '$' . Strings::firstLower($entityName) . ' = $this->getRepository()->findOneBy([';
-		$code[] = '	\'' . $fieldName . '\' => $' . $fieldName;
+		$code[] = '/** @var ' . $entityName . ' $' . $entityName . ' */';
+		$code[] = '$' . $entityName . ' = $this->getRepository()->findOneBy([';
+		$code[] = '	\'' . $columnName . '\' => $' . $fieldName;
 		$code[] = ']);';
 		$code[] = '';
-		$code[] = 'if ($' . Strings::firstLower($entityName) . ' === null) {';
-		$code[] = '	throw new ' . $entityName . 'NotFoundException(sprintf(\'' . $entityName . ' with ' . $fieldName . ' "%s" not found.\', $' . Strings::firstLower($fieldName) . '));';
+		$code[] = 'if ($' . $entityName . ' === null) {';
+		$code[] = '	throw new ' . $entityName . 'NotFoundException(sprintf(\'' . $entityName . ' with ' . $fieldName . ' "%s" not found.\', $' . $fieldName . '));';
 		$code[] = '}';
 		$code[] = '';
-		$code[] = 'return $' . Strings::firstLower($entityName) . ';';
+		$code[] = 'return $' . $entityName . ';';
 
 		return $code;
 	}
 
-	private function createGetAllByBody(string $fieldName): array
+	private function createGetAllByBody(string $columnName, string $fieldName): array
 	{
 		$code = [];
 
 		$code[] = 'return $this->getRepository()->findBy([';
-		$code[] = '	\'' . $fieldName . '\' => $' . $fieldName;
+		$code[] = '	\'' . $columnName . '\' => $' . $fieldName;
 		$code[] = ']);';
 
 		return $code;

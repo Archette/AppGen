@@ -15,10 +15,14 @@ class CreateModelResult
 	private bool $createEditMethod;
 	private bool $createDeleteMethod;
 	private bool $createSoftDeleteMethod;
-	private array $getByMethods = [];
-	private array $getAllByMethods = [];
 	private array $events = [];
 	private array $traits = [];
+
+	/** @var DoctrineEntityProperty[] */
+	private array $getByMethods = [];
+
+	/** @var DoctrineEntityProperty[] */
+	private array $getAllByMethods = [];
 
 	/** @var DoctrineEntityProperty[] */
 	private array $entityProperties;
@@ -48,10 +52,10 @@ class CreateModelResult
 
 		foreach ($this->entityProperties as $property) {
 			if (in_array($property->getName(), $getByMethods, true)) {
-				$this->getByMethods[$property->getName()] = $property->getType();
+				$this->getByMethods[] = $property;
 			}
 			if (in_array($property->getName(), $getAllByMethods, true)) {
-				$this->getAllByMethods[$property->getName()] = $property->getType();
+				$this->getAllByMethods[] = $property;
 			}
 		}
 	}
@@ -116,11 +120,13 @@ class CreateModelResult
 		return $this->createGetAllMethod;
 	}
 
+	/** @return DoctrineEntityProperty[] */
 	public function getGetByMethods(): array
 	{
 		return $this->getByMethods;
 	}
 
+	/** @return DoctrineEntityProperty[] */
 	public function getGetAllByMethods(): array
 	{
 		return $this->getAllByMethods;
