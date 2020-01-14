@@ -35,7 +35,9 @@ class EntityDataFactoryGenerator
 		foreach ($input->getEntityProperties() as $p) {
 			if ($p->getRelation() !== null) {
 				$constructor = $class->addMethod('__construct');
-				$namespace->addUse('Ramsey\Uuid\Uuid');
+				if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
+					$namespace->addUse('Ramsey\Uuid\Uuid');
+				}
 				foreach ($input->getEntityProperties() as $property) {
 					$relation = $property->getRelation();
 					if ($relation !== null) {
@@ -70,7 +72,11 @@ class EntityDataFactoryGenerator
 			$relation = $property->getRelation();
 			if ($relation !== null) {
 				if ($relation->getType() === $relation::RELATION_MANY_TO_ONE || $relation->getType() === $relation::RELATION_ONE_TO_ONE) {
-					$create->addBody(sprintf('$data->%1$s = $this->%2$sFacade->get(Uuid::fromString($formData[\'%1$s\']));', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
+					if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
+						$create->addBody(sprintf('$data->%1$s = $this->%2$sFacade->get(Uuid::fromString($formData[\'%1$s\']));', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
+					} else {
+						$create->addBody(sprintf('$data->%1$s = $this->%2$sFacade->get($formData[\'%1$s\']);', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
+					}
 				}
 			}
 		}
@@ -80,8 +86,12 @@ class EntityDataFactoryGenerator
 			if ($relation !== null) {
 				if ($relation->getType() === $relation::RELATION_ONE_TO_MANY || $relation->getType() === $relation::RELATION_MANY_TO_MANY) {
 					$create->addBody('');
-					$create->addBody(sprintf('foreach ($formData[\'%1$s\'] as $string) {', $property->getName()));
-					$create->addBody(sprintf('	$data->%1$s[] = $this->%2$sFacade->get(Uuid::fromString($string));', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
+					$create->addBody(sprintf('foreach ($formData[\'%1$s\'] as $identifier) {', $property->getName()));
+					if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
+						$create->addBody(sprintf('	$data->%1$s[] = $this->%2$sFacade->get(Uuid::fromString($identifier));', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
+					} else {
+						$create->addBody(sprintf('	$data->%1$s[] = $this->%2$sFacade->get($identifier);', $property->getName(), Strings::firstLower($relation->getTargetClassName())));
+					}
 					$create->addBody('}');
 				}
 			}
