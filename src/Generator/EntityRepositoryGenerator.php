@@ -123,6 +123,11 @@ class EntityRepositoryGenerator
 			->setVisibility(ClassType::VISIBILITY_PRIVATE)
 			->addBody('return $this->getRepository()->createQueryBuilder(\'e\');');
 
+		$class->addMethod('getQueryBuilderForDataGrid')
+			->setReturnType('Doctrine\ORM\QueryBuilder')
+			->setVisibility(ClassType::VISIBILITY_PUBLIC)
+			->addBody('return $this->getQueryBuilderForAll();');
+
 		$namespace->add($class);
 
 		return (string) $file;
