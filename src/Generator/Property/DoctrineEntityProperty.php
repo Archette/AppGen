@@ -13,7 +13,7 @@ class DoctrineEntityProperty implements Property
 	private string $type;
 	private string $doctrineType;
 	private ?int $doctrineMaxLength;
-	private ?string $defaultValue;
+	private $defaultValue;
 	private ?bool $nullable;
 	private ?bool $unique;
 	private ?RelationData $relationData;
@@ -23,7 +23,7 @@ class DoctrineEntityProperty implements Property
 		string $typeString,
 		string $type,
 		string $doctrineType,
-		string $defaultValue = null,
+		$defaultValue = null,
 		RelationData $relationData = null
 	) {
 		$this->name = $name;
