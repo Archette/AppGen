@@ -25,7 +25,7 @@ define('APPGEN_VERSION', '0.1');
 
 $application = new Application();
 
-if (!file_exists($configFile = 'appgen.neon')) {
+if (!file_exists(getcwd() . '/' . ($configFile = 'appgen.neon'))) {
 	$application->add(new InitialCommand());
 	$application->setDefaultCommand(InitialCommand::getDefaultName());
 } else {
