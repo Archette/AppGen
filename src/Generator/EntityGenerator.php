@@ -85,7 +85,7 @@ class EntityGenerator
 				$doctrineProperty->addComment(sprintf('@ORM\Column(type="%s"%s%s%s)',
 					$property->getDoctrineType(),
 					$property->getDoctrineMaxLength() !== null ? ', length=' . $property->getDoctrineMaxLength() : '',
-					$property->isNullable() ? ', nullable=false' : '',
+					$property->isNullable() ? ', nullable=true' : '',
 					$property->isUnique() ? ', unique=true' : ''
 				));
 			}
