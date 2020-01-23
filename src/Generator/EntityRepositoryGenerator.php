@@ -143,7 +143,7 @@ class EntityRepositoryGenerator
 		$code[] = ']);';
 		$code[] = '';
 		$code[] = 'if ($' . $entityName . ' === null) {';
-		$code[] = '	throw new ' . $entityName . 'NotFoundException(sprintf(\'' . $entityName . ' with ' . $fieldName . ' "%s" not found.\', $' . $fieldName . '));';
+		$code[] = '	throw new ' . $entityName . 'NotFoundException(sprintf(\'' . Strings::firstUpper($entityName) . ' with ' . $fieldName . ' "%s" not found.\', $' . $fieldName . '));';
 		$code[] = '}';
 		$code[] = '';
 		$code[] = 'return $' . $entityName . ';';
