@@ -137,7 +137,7 @@ class EntityRepositoryGenerator
 	{
 		$code = [];
 
-		$code[] = '/** @var ' . $entityName . ' $' . $entityName . ' */';
+		$code[] = '/** @var ' . Strings::firstUpper($entityName) . ' $' . $entityName . ' */';
 		$code[] = '$' . $entityName . ' = $this->getRepository()->findOneBy([';
 		$code[] = '	\'' . $columnName . '\' => $' . $fieldName;
 		$code[] = ']);';
