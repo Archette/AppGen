@@ -66,7 +66,7 @@ class EntityRepositoryGenerator
 		$get->setVisibility(ClassType::VISIBILITY_PUBLIC)
 			->addComment('@throws ' . $input->getNotFoundExceptionClass());
 
-		foreach ($this->createGetByBody($input->getEntityClass(), 'id', 'id') as $code) {
+		foreach ($this->createGetByBody(Strings::firstLower($input->getEntityClass()), 'id', 'id') as $code) {
 			$get->addBody($code);
 		}
 
