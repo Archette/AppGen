@@ -39,10 +39,10 @@ class EntityFacadeGenerator
 		if ($createdEvent = $input->getEventClass('created', true)) {
 			$namespace->addUse($createdEvent);
 		}
-		if ($updatedEvent = $input->getEventClass('updated')) {
+		if ($updatedEvent = $input->getEventClass('updated', true)) {
 			$namespace->addUse($updatedEvent);
 		}
-		if ($deletedEvent = $input->getEventClass('deleted')) {
+		if ($deletedEvent = $input->getEventClass('deleted', true)) {
 			$namespace->addUse($deletedEvent);
 		}
 		if ($input->createEditMethod() || $input->createDeleteMethod()) {
