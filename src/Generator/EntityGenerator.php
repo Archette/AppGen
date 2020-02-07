@@ -35,7 +35,7 @@ class EntityGenerator
 			$namespace->addUse($class);
 		}
 
-		$tableName = str_replace('-', '_', Strings::webalize($input->getEntityClass()));
+		$tableName = ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $input->getEntityClass())), '_');
 		$class = new ClassType($input->getEntityClass());
 
 		$class->addComment('@ORM\Entity')
