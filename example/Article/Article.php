@@ -35,6 +35,7 @@ class Article
 	public function __construct(UuidInterface $id, ArticleData $data)
 	{
 		$this->id = $id;
+		$this->edit($data);
 	}
 
 	public function edit(ArticleData $data): void
