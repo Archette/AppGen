@@ -26,6 +26,13 @@ class ClassHelper
 				return $m[1];
 			}
 		}
+		
+		/** @var SplFileInfo $file */
+		foreach (Finder::findFiles(sprintf('%s.php', $className))->in('vendor')->limitDepth(100) as $key => $file) {
+			if (preg_match('#^namespace\s+(.+?);$#sm', file_get_contents($key), $m)) {
+				return $m[1];
+			}
+		}
 
 		return null;
 	}
