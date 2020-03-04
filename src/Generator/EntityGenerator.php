@@ -57,13 +57,14 @@ class EntityGenerator
 				->setVisibility(ClassType::VISIBILITY_PRIVATE);
 
 			if ($relation = $property->getRelation()) {
+				$namespace->addUse($relation->getTargetClass());
+
 				if ($relation->getType() === $relation::RELATION_MANY_TO_ONE || $relation->getType() === $relation::RELATION_ONE_TO_ONE) {
 					$doctrineProperty->setType($property->getType())
 						->setNullable($property->isNullable());
 
 				} else {
 					$doctrineProperty->addComment(sprintf('@var %s[]', $relation->getTargetClassName()));
-					$namespace->addUse($relation->getTargetClass());
 				}
 
 				$doctrineProperty->addComment(sprintf('@ORM\%s(targetEntity="\%s"%s%s%s)',

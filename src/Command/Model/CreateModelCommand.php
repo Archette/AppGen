@@ -100,8 +100,9 @@ class CreateModelCommand extends BaseCommand
 						$doctrineType = $this->classHelper->formatDoctrineType($type);
 
 					} catch (TypeNotFoundException $e) {
-						$phpType = $doctrineType = $this->classHelper->resolveNamespace($type) . '\\' . $type;
-
+						$cleanType = trim($type, '?');
+						$phpType = $doctrineType = $this->classHelper->resolveNamespace($cleanType) . '\\' . $cleanType;
+						
 						if ($phpType !== null) {
 							while (true) {
 								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <yellow>Relation Type</yellow> (<blue>1:1</blue>/<blue>M:1</blue>/<blue>1:M</blue>/<blue>N:M</blue>) [<info>M:1</info>]: ', 'M:1')));
@@ -135,7 +136,7 @@ class CreateModelCommand extends BaseCommand
 								$onDeleteCascade = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Add Cascade Delete on Database Level</yellow>? [<info>no</info>] ', false));
 							}
 
-							$relationData = new RelationData($relation, $phpType, trim($type, '?'), $bidirectional, $cascadeAttributes, $onDeleteCascade);
+							$relationData = new RelationData($relation, $phpType, $cleanType, $bidirectional, $cascadeAttributes, $onDeleteCascade);
 
 						} else {
 							$output->writeln('');

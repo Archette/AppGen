@@ -21,15 +21,15 @@ class ClassHelper
 	public function resolveNamespace(string $className): ?string
 	{
 		/** @var SplFileInfo $file */
-		foreach (Finder::findFiles(sprintf('%s.php', $className))->in($this->config->appDir)->limitDepth(100) as $key => $file) {
-			if (preg_match('#^namespace\s+(.+?);$#sm', file_get_contents($key), $m)) {
+		foreach (Finder::findFiles(sprintf('%s.php', $className))->in(getcwd() . DIRECTORY_SEPARATOR . $this->config->appDir)->limitDepth(100) as $key => $file) {
+			if (preg_match('/namespace\s(.*);/', file_get_contents($key), $m)) {
 				return $m[1];
 			}
 		}
 		
 		/** @var SplFileInfo $file */
-		foreach (Finder::findFiles(sprintf('%s.php', $className))->in('vendor')->limitDepth(100) as $key => $file) {
-			if (preg_match('#^namespace\s+(.+?);$#sm', file_get_contents($key), $m)) {
+		foreach (Finder::findFiles(sprintf('%s.php', $className))->in(getcwd() . DIRECTORY_SEPARATOR . 'vendor')->limitDepth(100) as $key => $file) {
+			if (preg_match('/namespace\s(.*);/', file_get_contents($key), $m)) {
 				return $m[1];
 			}
 		}
