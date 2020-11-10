@@ -14,8 +14,9 @@ class DoctrineEntityProperty implements Property
 	private string $doctrineType;
 	private ?int $doctrineMaxLength;
 	private $defaultValue;
-	private ?bool $nullable;
-	private ?bool $unique;
+	private bool $nullable;
+	private bool $unique;
+	private bool $unsigned;
 	private ?RelationData $relationData;
 
 	public function __construct(
@@ -29,6 +30,7 @@ class DoctrineEntityProperty implements Property
 		$this->name = $name;
 		$this->nullable = $this->isTypeNullable($typeString);
 		$this->unique = $this->isTypeUnique($typeString);
+		$this->unsigned = $this->isTypeUnsigned($typeString);
 		$this->doctrineMaxLength = $this->getMaxLength($typeString);
 
 		$this->type = $type;
@@ -62,6 +64,11 @@ class DoctrineEntityProperty implements Property
 	private function isTypeUnique(string $type): bool
 	{
 		return Strings::contains($type, ' --unique');
+	}
+
+	private function isTypeUnsigned(string $type): bool
+	{
+		return Strings::contains($type, ' --unsigned');
 	}
 
 	private function getMaxLength(string $type): ?int
@@ -133,6 +140,11 @@ class DoctrineEntityProperty implements Property
 	public function isUnique(): bool
 	{
 		return $this->unique;
+	}
+
+	public function isUnsigned(): bool
+	{
+		return $this->unsigned;
 	}
 
 	public function getRelation(): ?RelationData

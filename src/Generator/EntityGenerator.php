@@ -83,11 +83,12 @@ class EntityGenerator
 				$doctrineProperty->setType($property->getType())
 					->setNullable($property->isNullable());
 
-				$doctrineProperty->addComment(sprintf('@ORM\Column(type="%s"%s%s%s)',
+				$doctrineProperty->addComment(sprintf('@ORM\Column(type="%s"%s%s%s%s)',
 					$property->getDoctrineType(),
 					$property->getDoctrineMaxLength() !== null ? ', length=' . $property->getDoctrineMaxLength() : '',
 					$property->isNullable() ? ', nullable=true' : '',
-					$property->isUnique() ? ', unique=true' : ''
+					$property->isUnique() ? ', unique=true' : '',
+					$property->isUnsigned() ? ', options={unsigned=true}' : ''
 				));
 			}
 
