@@ -88,7 +88,7 @@ class EntityGenerator
 					$property->getDoctrineMaxLength() !== null ? ', length=' . $property->getDoctrineMaxLength() : '',
 					$property->isNullable() ? ', nullable=true' : '',
 					$property->isUnique() ? ', unique=true' : '',
-					$property->isUnsigned() ? ', options={unsigned=true}' : ''
+					$property->isUnsigned() ? ', options={"unsigned"=true}' : ''
 				));
 			}
 
