@@ -14,16 +14,12 @@ use Test\Article\Exception\ArticleNotFoundException;
 
 final class ArticleFacade extends ArticleRepository
 {
-	private ArticleFactory $articleFactory;
-	private EntityManagerInterface $entityManager;
-	private EventDispatcherInterface $eventDispatcher;
-
-	public function __construct(ArticleFactory $articleFactory, EntityManagerInterface $entityManager, EventDispatcherInterface $eventDispatcher)
-	{
+	public function __construct(
+		private ArticleFactory $articleFactory,
+		private EntityManagerInterface $entityManager,
+		private EventDispatcherInterface $eventDispatcher
+	) {
 		parent::__construct($entityManager);
-		$this->articleFactory = $articleFactory;
-		$this->entityManager = $entityManager;
-		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	public function create(ArticleData $data): Article
