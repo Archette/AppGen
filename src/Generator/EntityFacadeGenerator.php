@@ -55,35 +55,21 @@ class EntityFacadeGenerator
 
 		$constructor = $class->addMethod('__construct');
 
-		$factoryProperty = $class->addProperty(Strings::firstLower($input->getFactoryClass()))
+		$constructor->addPromotedParameter($factoryPropertyName = Strings::firstLower($input->getFactoryClass()))
 			->setType($input->getFactoryClass(true))
-			->setVisibility(ClassType::VISIBILITY_PRIVATE);
+			->setPrivate();
 
-		$constructor->addParameter($factoryProperty->getName())
-			->setType($factoryProperty->getType());
-
-		$entityManagerProperty = $class->addProperty('entityManager')
+		$constructor->addPromotedParameter($entityManagerPropertyName = 'entityManager')
 			->setType('\Doctrine\ORM\EntityManagerInterface')
-			->setVisibility(ClassType::VISIBILITY_PRIVATE);
-
-		$constructor->addParameter($entityManagerProperty->getName())
-			->setType($entityManagerProperty->getType());
+			->setPrivate();
 
 		if ($input->hasEvents()) {
-			$eventDispatcherProperty = $class->addProperty('eventDispatcher')
+			$constructor->addPromotedParameter('eventDispatcher')
 				->setType('\Symfony\Component\EventDispatcher\EventDispatcherInterface')
-				->setVisibility(ClassType::VISIBILITY_PRIVATE);
-
-			$constructor->addParameter($eventDispatcherProperty->getName())
-				->setType($eventDispatcherProperty->getType());
+				->setPrivate();
 		}
 
-		$constructor->addBody(sprintf('parent::__construct($%s);', $entityManagerProperty->getName()));
-		$constructor->addBody(sprintf('$this->%1$s = $%1$s;', $factoryProperty->getName()));
-		$constructor->addBody(sprintf('$this->%1$s = $%1$s;', $entityManagerProperty->getName()));
-		if (isset($eventDispatcherProperty)) {
-			$constructor->addBody(sprintf('$this->%1$s = $%1$s;', $eventDispatcherProperty->getName()));
-		}
+		$constructor->addBody(sprintf('parent::__construct($%s);', $entityManagerPropertyName));
 
 		$create = $class->addMethod('create')
 			->setReturnType($input->getEntityClass(true))
@@ -92,10 +78,10 @@ class EntityFacadeGenerator
 		$create->addParameter('data')
 			->setType($input->getDataClass(true));
 
-		$create->addBody(sprintf('$%s = $this->%s->create($data);', Strings::firstLower($input->getEntityClass()), $factoryProperty->getName()));
+		$create->addBody(sprintf('$%s = $this->%s->create($data);', Strings::firstLower($input->getEntityClass()), $factoryPropertyName));
 		$create->addBody('');
-		$create->addBody(sprintf('$this->%s->persist($%s);', $entityManagerProperty->getName(), Strings::firstLower($input->getEntityClass())));
-		$create->addBody(sprintf('$this->%s->flush();', $entityManagerProperty->getName()));
+		$create->addBody(sprintf('$this->%s->persist($%s);', $entityManagerPropertyName, Strings::firstLower($input->getEntityClass())));
+		$create->addBody(sprintf('$this->%s->flush();', $entityManagerPropertyName));
 		$create->addBody('');
 		if (isset($eventDispatcherProperty) && $createdEvent = $input->getEventClass('created')) {
 			$create->addBody(sprintf('$this->%s->dispatch(new %s($%s));', $eventDispatcherProperty->getName(), $createdEvent, Strings::firstLower($input->getEntityClass())));
@@ -119,7 +105,7 @@ class EntityFacadeGenerator
 			$edit->addBody(sprintf('$%s = $this->get($id);', Strings::firstLower($input->getEntityClass())));
 			$edit->addBody('');
 			$edit->addBody(sprintf('$%s->edit($data);', Strings::firstLower($input->getEntityClass())));
-			$edit->addBody(sprintf('$this->%s->flush();', $entityManagerProperty->getName()));
+			$edit->addBody(sprintf('$this->%s->flush();', $entityManagerPropertyName));
 			$edit->addBody('');
 			if (isset($eventDispatcherProperty) && $updatedEvent = $input->getEventClass('updated')) {
 				$edit->addBody(sprintf('$this->%s->dispatch(new %s($%s));', $eventDispatcherProperty->getName(), $updatedEvent, Strings::firstLower($input->getEntityClass())));
@@ -144,8 +130,8 @@ class EntityFacadeGenerator
 				$delete->addBody(sprintf('$this->%s->dispatch(new %s($%s));', $eventDispatcherProperty->getName(), $deletedEvent, Strings::firstLower($input->getEntityClass())));
 				$delete->addBody('');
 			}
-			$delete->addBody(sprintf('$this->%s->remove($%s);', $entityManagerProperty->getName(), Strings::firstLower($input->getEntityClass())));
-			$delete->addBody(sprintf('$this->%s->flush();', $entityManagerProperty->getName()));
+			$delete->addBody(sprintf('$this->%s->remove($%s);', $entityManagerPropertyName, Strings::firstLower($input->getEntityClass())));
+			$delete->addBody(sprintf('$this->%s->flush();', $entityManagerPropertyName));
 		}
 
 		$namespace->add($class);

@@ -43,12 +43,9 @@ class EntityDataFactoryGenerator
 					if ($relation !== null) {
 						if (!in_array($relation->getTargetClass() . 'Facade', $namespace->getUses())) {
 							$namespace->addUse($relation->getTargetClass() . 'Facade');
-							$class->addProperty(Strings::firstLower($relation->getTargetClassName()) . 'Facade')
+							$constructor->addPromotedParameter(Strings::firstLower($relation->getTargetClassName()) . 'Facade')
 								->setType($relation->getTargetClass() . 'Facade')
-								->setVisibility(ClassType::VISIBILITY_PRIVATE);
-							$constructor->addParameter(Strings::firstLower($relation->getTargetClassName()) . 'Facade')
-								->setType($relation->getTargetClass() . 'Facade');
-							$constructor->addBody(sprintf('$this->%1$sFacade = $%1$sFacade;', Strings::firstLower($relation->getTargetClassName())));
+								->setPrivate();
 						}
 					}
 				}

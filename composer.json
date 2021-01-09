@@ -10,12 +10,13 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
-        "nette/neon": "^3.1",
-        "nette/schema": "^1.0",
-        "nette/php-generator": "^3.3",
-        "symfony/console": "4 - 5",
-        "nette/finder": "^3.0@dev"
+        "nette/neon": "^3.2",
+        "nette/schema": "^1.0.0",
+        "nette/php-generator": "^3.5",
+        "symfony/console": "^4.0",
+        "nette/finder": "^3.0.0"
     },
     "bin": [
         "bin/appgen",
@@ -28,7 +29,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.4"
+            "php": "8.0"
         }
     }
 }

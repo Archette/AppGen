@@ -21,7 +21,7 @@ use Nette\Schema\Expect;
 use Nette\Schema\Processor;
 use Symfony\Component\Console\Application;
 
-define('APPGEN_VERSION', '0.1');
+define('APPGEN_VERSION', '1.1');
 
 $application = new Application();
 

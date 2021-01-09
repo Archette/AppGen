@@ -18,6 +18,7 @@ use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
 use Archette\AppGen\Generator\Property\Relation\RelationData;
 use Archette\AppGen\Helper\ClassHelper;
 use Archette\AppGen\Helper\Exception\TypeNotFoundException;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -71,15 +72,15 @@ class CreateModelCommand extends BaseCommand
 		/** @var QuestionHelper $questionHelper */
 		$questionHelper = $this->getHelper('question');
 
-		$entityName = $questionHelper->ask($input, $output, new Question('# <blue>Entity Name</blue>: '));
-		$namespace = trim($questionHelper->ask($input, $output, new Question('# <blue>Namespace</blue>: ')), '\\');
+		$entityName = $questionHelper->ask($input, $output, new Question('# <fg=blue>Entity Name</>: '));
+		$namespace = trim($questionHelper->ask($input, $output, new Question('# <fg=blue>Namespace</>: ')), '\\');
 		$output->writeln('');
 
 		/** @var DoctrineEntityProperty[] $properties */
 		$properties = [];
 
 		$type = $phpType = $doctrineType = $relation = '';
-		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Define Entity Properties</blue>? [<info>yes</info>] ', true))) {
+		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Define Entity Properties</>? [<info>yes</info>] ', true))) {
 			$lazyName = null;
 			while (true) {
 				$relationData = null;
@@ -87,13 +88,13 @@ class CreateModelCommand extends BaseCommand
 				$output->writeln('');
 				if ($lazyName !== null) {
 					$name = $lazyName;
-					$output->writeln(sprintf('# <yellow>Property Name</yellow>: %s', $name));
+					$output->writeln(sprintf('# <fg=yellow>Property Name</>: %s', $name));
 				} else {
-					$name = $questionHelper->ask($input, $output, new Question('# <yellow>Property Name</yellow>: '));
+					$name = $questionHelper->ask($input, $output, new Question('# <fg=yellow>Property Name</>: '));
 				}
 
 				while (true) {
-					$type = $questionHelper->ask($input, $output, new Question('# <yellow>Type</yellow> (e.g. "<blue>?string|31 --unique</blue>") [<info>string</info>]: ', 'string'));
+					$type = $questionHelper->ask($input, $output, new Question('# <fg=yellow>Type</> (e.g. "<fg=blue>?string|31 --unique</>") [<info>string</info>]: ', 'string'));
 
 					try {
 						$phpType = $this->classHelper->formatPhpType($type);
@@ -105,7 +106,7 @@ class CreateModelCommand extends BaseCommand
 						
 						if ($phpType !== null) {
 							while (true) {
-								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <yellow>Relation Type</yellow> (<blue>1:1</blue>/<blue>M:1</blue>/<blue>1:M</blue>/<blue>N:M</blue>) [<info>M:1</info>]: ', 'M:1')));
+								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <fg=yellow>Relation Type</> (<fg=blue>1:1</blue>/<blue>M:1</blue>/<blue>1:M</blue>/<blue>N:M</>) [<info>M:1</info>]: ', 'M:1')));
 
 								if ($relation === '1:1') {
 									$relation = RelationData::RELATION_ONE_TO_ONE;
@@ -125,15 +126,15 @@ class CreateModelCommand extends BaseCommand
 								break;
 							}
 
-							$bidirectional = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Bidirectional</yellow> (add mappedBy/inversedBy)? [<info>no</info>] ', false));
-							$cascadeAttributes = $questionHelper->ask($input, $output, new Question('# <yellow>Define Cascade Attributes</yellow> (<blue>persist</blue>/<blue>remove</blue>/<blue>all</blue>): ', 'no'));
+							$bidirectional = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=yellow>Bidirectional</> (add mappedBy/inversedBy)? [<info>no</info>] ', false));
+							$cascadeAttributes = $questionHelper->ask($input, $output, new Question('# <fg=yellow>Define Cascade Attributes</> (<fg=blue>persist</>/<fg=blue>remove</>/<fg=blue>all</>): ', 'no'));
 							if (!in_array($cascadeAttributes, ['persist', 'remove', 'all'])) {
 								$cascadeAttributes = null;
 							}
 
 							$onDeleteCascade = false;
 							if ($relation === RelationData::RELATION_ONE_TO_ONE || $relation === RelationData::RELATION_MANY_TO_ONE) {
-								$onDeleteCascade = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <yellow>Add Cascade Delete on Database Level</yellow>? [<info>no</info>] ', false));
+								$onDeleteCascade = (bool) $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=yellow>Add Cascade Delete on Database Level</>? [<info>no</info>] ', false));
 							}
 
 							$relationData = new RelationData($relation, $phpType, $cleanType, $bidirectional, $cascadeAttributes, $onDeleteCascade);
@@ -150,7 +151,7 @@ class CreateModelCommand extends BaseCommand
 				}
 
 				if ($relationData === null) {
-					$value = $questionHelper->ask($input, $output, new Question('# <yellow>Default Value</yellow>: '));
+					$value = $questionHelper->ask($input, $output, new Question('# <fg=yellow>Default Value</>: '));
 				} else {
 					$value = null;
 				}
@@ -158,7 +159,7 @@ class CreateModelCommand extends BaseCommand
 
 				$properties[$name] = new DoctrineEntityProperty((string) $name, $type, $phpType, $doctrineType, $value, $relationData);
 
-				$defineAnother = $questionHelper->ask($input, $output, new Question('# <blue>Define Another Property</blue>? [<info>yes</info>] '));
+				$defineAnother = $questionHelper->ask($input, $output, new Question('# <fg=blue>Define Another Property</>? [<info>yes</info>] '));
 				if ($defineAnother === null || strtolower($defineAnother) === 'yes' || strtolower($defineAnother) === 'y') {
 					$lazyName = null;
 					continue;
@@ -172,15 +173,15 @@ class CreateModelCommand extends BaseCommand
 		}
 
 		$output->writeln('');
-		$createDataFactory = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>DataFactory</yellow> Class for Form Handling</blue>? [<info>yes</info>] ', true));
-		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>edit</yellow> and <yellow>getData</yellow> Method</blue>? [<info>yes</info>] ', true));
-		$createGetAllMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>getAll</yellow> Method</blue>? [<info>yes</info>] ', true));
-		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Create <yellow>delete</yellow> Method</blue>? [<info>yes</info>] ', true));
+		$createDataFactory = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Create <fg=yellow>DataFactory</> Class for Form Handling</>? [<info>yes</info>] ', true));
+		$createEditMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Create <fg=yellow>edit</> and <fg=yellow>getData</> Method</>? [<info>yes</info>] ', true));
+		$createGetAllMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Create <fg=yellow>getAll</> Method</>? [<info>yes</info>] ', true));
+		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Create <fg=yellow>delete</> Method</>? [<info>yes</info>] ', true));
 		$output->writeln('');
 
 		$getByMethods = [];
 		while (true) {
-			$getByMethods = $questionHelper->ask($input, $output, new Question('# <blue>Define Fields for <yellow>getBy<Field></yellow> Methods (e.g. "<yellow>email, slug</yellow>")</blue>: ', []));
+			$getByMethods = $questionHelper->ask($input, $output, new Question('# <fg=blue>Define Fields for <fg=yellow>getBy<Field></> Methods (e.g. "<fg=yellow>email, slug</>")</>: ', []));
 			if (is_string($getByMethods)) {
 				$getByMethods = explode(',', str_replace(' ', '', $getByMethods));
 			}
@@ -199,7 +200,7 @@ class CreateModelCommand extends BaseCommand
 
 		$getAllByMethods = [];
 		while (true) {
-			$getAllByMethods = $questionHelper->ask($input, $output, new Question('# <blue>Define Fields for <yellow>getAllBy<Field></yellow> Methods (e.g. "<yellow>author, type</yellow>")</blue>: ', []));
+			$getAllByMethods = $questionHelper->ask($input, $output, new Question('# <fg=blue>Define Fields for <fg=yellow>getAllBy<Field></> Methods (e.g. "<fg=yellow>author, type</>")</>: ', []));
 			if (is_string($getAllByMethods)) {
 				$getAllByMethods = explode(',', str_replace(' ', '', $getAllByMethods));
 			}
@@ -216,7 +217,7 @@ class CreateModelCommand extends BaseCommand
 			break;
 		}
 
-		$events = $questionHelper->ask($input, $output, new Question('# <blue>Define Events (for "<yellow>created, updated, deleted</yellow>" type "<yellow>all</yellow>")</blue>: ', []));
+		$events = $questionHelper->ask($input, $output, new Question('# <fg=blue>Define Events (for "<fg=yellow>created, updated, deleted</>" type "<fg=yellow>all</>")</>: ', []));
 		if (is_string($events)) {
 			if ($events === 'all') {
 				$events = 'created, updated, deleted';
@@ -238,7 +239,7 @@ class CreateModelCommand extends BaseCommand
 			if ($class === null) {
 				continue;
 			}
-			if ($questionHelper->ask($input, $output, new ConfirmationQuestion(sprintf('# <blue>Use <yellow>%s</yellow> Trait</blue>? [<info>yes</info>] ', $name), true))) {
+			if ($questionHelper->ask($input, $output, new ConfirmationQuestion(sprintf('# <fg=blue>Use <fg=yellow>%s</> Trait</>? [<info>yes</info>] ', $name), true))) {
 				$traits[$name] = $class;
 			}
 		}

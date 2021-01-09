@@ -25,18 +25,18 @@ class InitialCommand extends BaseCommand
 		/** @var QuestionHelper $questionHelper */
 		$questionHelper = $this->getHelper('question');
 
-		$output->writeln('# <yellow>Configure the AppGen (traits can be added later)</yellow>');
+		$output->writeln('# <fg=yellow>Configure the AppGen (traits can be added later)</>');
 		$output->writeln('');
 
 		$config = new AppGenConfig();
 
-		$config->appDir = $questionHelper->ask($input, $output, new Question('# <blue>Please Specify App Directory</blue> [<info>app</info>]: ', 'app'));
-		$config->model->entity->idType = $questionHelper->ask($input, $output, new Question('# <blue>Please Specify Entity ID Column Type</blue> [<info>uuid_binary</info>]: ', 'uuid_binary'));
+		$config->appDir = $questionHelper->ask($input, $output, new Question('# <fg=blue>Please Specify App Directory</> [<info>app</info>]: ', 'app'));
+		$config->model->entity->idType = $questionHelper->ask($input, $output, new Question('# <fg=blue>Please Specify Entity ID Column Type</> [<info>uuid_binary</info>]: ', 'uuid_binary'));
 		if (!Strings::contains($config->model->entity->idType, 'uuid')) {
-			$config->model->entity->idComment = $questionHelper->ask($input, $output, new Question('# <blue>Please Specify ID Generator Comment</blue> [<info>@ORM\GeneratedValue</info>]: ', '@ORM\GeneratedValue'));
+			$config->model->entity->idComment = $questionHelper->ask($input, $output, new Question('# <fg=blue>Please Specify ID Generator Comment</> [<info>@ORM\GeneratedValue</info>]: ', '@ORM\GeneratedValue'));
 		}
-		$config->model->entity->createSetters = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Do You Still Use Setters?</blue> [<info>no, I\'m a big boy</info>]: ', false));
-		$config->model->symfonyEvents = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <blue>Are You Using Symfony Events?</blue> [<info>yes</info>]: ', true));
+		$config->model->entity->createSetters = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Do You Still Use Setters?</> [<info>no, I\'m a big boy</info>]: ', false));
+		$config->model->symfonyEvents = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Are You Using Symfony Events?</> [<info>yes</info>]: ', true));
 		$output->writeln('');
 
 		file_put_contents('appgen.neon', str_replace(['    ', "\n\n"], ["\t", "\n"], Neon::encode($config, Neon::BLOCK)));

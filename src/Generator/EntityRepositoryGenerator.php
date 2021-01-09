@@ -44,15 +44,11 @@ class EntityRepositoryGenerator
 
 		$class = new ClassType($input->getRepositoryClass());
 		$class->setAbstract();
-
-		$class->addProperty('entityManager')
-			->setVisibility(ClassType::VISIBILITY_PRIVATE)
-			->setType('Doctrine\ORM\EntityManagerInterface');
-
+		
 		$constructor = $class->addMethod('__construct');
-		$constructor->addParameter('entityManager')
-			->setType('Doctrine\ORM\EntityManagerInterface');
-		$constructor->addBody('$this->entityManager = $entityManager;');
+		$constructor->addPromotedParameter('entityManager')
+			->setType('Doctrine\ORM\EntityManagerInterface')
+			->setPrivate();
 
 		$class->addMethod('getRepository')
 			->setVisibility(ClassType::VISIBILITY_PRIVATE)

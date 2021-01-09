@@ -19,7 +19,7 @@ abstract class BaseCommand extends Command
 
 		$output->writeln('');
 		$output->writeln('<info>#################################################</info>');
-		$output->writeln(sprintf('<info>~</info> Welcome to <blue>AppGen v%s</blue> created by <blue>Rick Strafy</blue> <info>~</info>', APPGEN_VERSION));
+		$output->writeln(sprintf('<info>~</info> Welcome to <fg=blue>AppGen v%s</blue> created by <blue>Rick Strafy</> <info>~</info>', APPGEN_VERSION));
 		$output->writeln('<info>#################################################</info>');
 		$output->writeln('');
 
