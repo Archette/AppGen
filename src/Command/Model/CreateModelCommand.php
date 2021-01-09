@@ -18,7 +18,6 @@ use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
 use Archette\AppGen\Generator\Property\Relation\RelationData;
 use Archette\AppGen\Helper\ClassHelper;
 use Archette\AppGen\Helper\Exception\TypeNotFoundException;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -79,7 +78,6 @@ class CreateModelCommand extends BaseCommand
 		/** @var DoctrineEntityProperty[] $properties */
 		$properties = [];
 
-		$type = $phpType = $doctrineType = $relation = '';
 		if ($questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Define Entity Properties</>? [<info>yes</info>] ', true))) {
 			$lazyName = null;
 			while (true) {
@@ -179,7 +177,6 @@ class CreateModelCommand extends BaseCommand
 		$createDeleteMethod = $questionHelper->ask($input, $output, new ConfirmationQuestion('# <fg=blue>Create <fg=yellow>delete</> Method</>? [<info>yes</info>] ', true));
 		$output->writeln('');
 
-		$getByMethods = [];
 		while (true) {
 			$getByMethods = $questionHelper->ask($input, $output, new Question('# <fg=blue>Define Fields for <fg=yellow>getBy<Field></> Methods (e.g. "<fg=yellow>email, slug</>")</>: ', []));
 			if (is_string($getByMethods)) {
@@ -198,7 +195,6 @@ class CreateModelCommand extends BaseCommand
 			break;
 		}
 
-		$getAllByMethods = [];
 		while (true) {
 			$getAllByMethods = $questionHelper->ask($input, $output, new Question('# <fg=blue>Define Fields for <fg=yellow>getAllBy<Field></> Methods (e.g. "<fg=yellow>author, type</>")</>: ', []));
 			if (is_string($getAllByMethods)) {
