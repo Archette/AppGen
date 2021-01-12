@@ -104,7 +104,7 @@ class CreateModelCommand extends BaseCommand
 						
 						if ($phpType !== null) {
 							while (true) {
-								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <fg=yellow>Relation Type</> (<fg=blue>1:1</blue>/<blue>M:1</blue>/<blue>1:M</blue>/<blue>N:M</>) [<info>M:1</info>]: ', 'M:1')));
+								$relation = strtolower($questionHelper->ask($input, $output, new Question('# <fg=yellow>Relation Type</> (<fg=blue>1:1</>/<fg=blue>M:1</>/<fg=blue>1:M</>/<fg=blue>N:M</>) [<info>M:1</info>]: ', 'M:1')));
 
 								if ($relation === '1:1') {
 									$relation = RelationData::RELATION_ONE_TO_ONE;
