@@ -52,7 +52,7 @@ class EntityRepositoryGenerator
 
 		$class->addMethod('getRepository')
 			->setVisibility(ClassType::VISIBILITY_PRIVATE)
-			->addComment('@return EntityRepository|ObjectRepository')
+			->setReturnType('Doctrine\Persistence\ObjectRepository')
 			->addBody('return $this->entityManager->getRepository(' . $input->getEntityClass() . '::class);');
 
 		$get = $class->addMethod('get');
