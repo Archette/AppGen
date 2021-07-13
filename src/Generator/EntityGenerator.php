@@ -31,8 +31,15 @@ class EntityGenerator
 
 		$namespace->addUse('Doctrine\ORM\Mapping', 'ORM');
 		$namespace->addUse('Ramsey\Uuid\UuidInterface');
-		foreach ($input->getTraits() as $name => $class) {
+		
+		foreach ($input->getTraits() as $class) {
 			$namespace->addUse($class);
+		}
+		
+		foreach ($input->getEntityProperties() as $property) {
+			if (Strings::startsWith($property->getType(), '\\')) {
+				$namespace->addUse($property->getType());
+			}
 		}
 
 		$tableName = ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $input->getEntityClass())), '_');
@@ -83,21 +90,24 @@ class EntityGenerator
 				$doctrineProperty->setType($property->getType())
 					->setNullable($property->isNullable());
 
-				$doctrineProperty->addComment(sprintf('@ORM\Column(type="%s"%s%s%s%s)',
-					$property->getDoctrineType(),
+				$comment = sprintf('@ORM\Column(%s%s%s%s)',
+					!$property->hasPhpMappedType() ? 'type="' . $property->getDoctrineType() . '"' : '',
 					$property->getDoctrineMaxLength() !== null ? ', length=' . $property->getDoctrineMaxLength() : '',
-					$property->isNullable() ? ', nullable=true' : '',
 					$property->isUnique() ? ', unique=true' : '',
 					$property->isUnsigned() ? ', options={"unsigned"=true}' : ''
-				));
-			}
-
-			if ($property->getDefaultValue() !== null || $property->isNullable()) {
-				$doctrineProperty->setValue($property->getDefaultValue());
+				);
+				
+				if ($comment === '@ORM\Column()') {
+					$comment = '@ORM\Column';
+				}
+				
+				$comment = str_replace('(, ', '(', $comment);
+				
+				$doctrineProperty->addComment($comment);
 			}
 		}
 
-		foreach ($input->getTraits() as $name => $className) {
+		foreach ($input->getTraits() as $className) {
 			$class->addTrait($className);
 		}
 

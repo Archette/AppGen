@@ -64,8 +64,16 @@ class ClassHelper
 			return 'array';
 		}
 
-		if (in_array($type, ['time', 'date', 'datetime', 'datetimez'])) {
+		if (in_array($type, ['time', 'date', 'datetime', 'datetimez', 'dt'])) {
 			return '\DateTime';
+		}
+
+		if (in_array($type, ['datetimeimmutable', 'dti'])) {
+			return '\DateTimeImmutable';
+		}
+
+		if (in_array($type, ['dateinterval', 'di'])) {
+			return '\DateInterval';
 		}
 
 		if (in_array($type, ['uuid', 'uuid_binary'])) {
@@ -90,6 +98,18 @@ class ClassHelper
 			$type = 'integer';
 		}
 
+		if ($type === 'dt') {
+			$type = 'datetime';
+		}
+
+		if ($type === 'dti') {
+			$type = 'datetimeimmutable';
+		}
+
+		if ($type === 'di') {
+			$type = 'dateinterval';
+		}
+
 		if (!in_array($type, [
 			'integer',
 			'smallint',
@@ -106,6 +126,8 @@ class ClassHelper
 			'time',
 			'date',
 			'datetime',
+			'datetimeimmutable',
+			'dateinterval',
 			'datetimez',
 			'uuid',
 			'uuid_binary'

@@ -151,4 +151,18 @@ class DoctrineEntityProperty implements Property
 	{
 		return $this->relationData;
 	}
+	
+	public function hasPhpMappedType(): bool
+	{
+		return in_array(str_replace('?', '', $this->type), [
+			'array',
+			'bool',
+			'float',
+			'int',
+			'string',
+			'\DateInterval',
+			'\DateTime',
+			'\DateTimeImmutable'
+		]);
+	}
 }

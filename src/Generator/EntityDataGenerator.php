@@ -8,6 +8,7 @@ use Archette\AppGen\Command\Model\CreateModelResult;
 use Archette\AppGen\Config\AppGenConfig;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
+use Nette\Utils\Strings;
 
 class EntityDataGenerator
 {
@@ -37,6 +38,10 @@ class EntityDataGenerator
 			$relation = $property->getRelation();
 			if ($relation !== null) {
 				$namespace->addUse($relation->getTargetClass());
+			}
+
+			if (Strings::startsWith($property->getType(), '\\')) {
+				$namespace->addUse($property->getType());
 			}
 
 			if ($relation !== null && ($relation->getType() === $relation::RELATION_ONE_TO_MANY || $relation->getType() === $relation::RELATION_MANY_TO_MANY)) {
