@@ -18,6 +18,8 @@ use Archette\AppGen\Generator\Property\DoctrineEntityProperty;
 use Archette\AppGen\Generator\Property\Relation\RelationData;
 use Archette\AppGen\Helper\ClassHelper;
 use Archette\AppGen\Helper\Exception\TypeNotFoundException;
+use Exception;
+use Nette\Utils\Strings;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -73,8 +75,29 @@ class CreateModelCommand extends BaseCommand
 
 		$entityName = $questionHelper->ask($input, $output, new Question('# <fg=blue>Entity Name</>: '));
 		$namespace = trim($questionHelper->ask($input, $output, new Question('# <fg=blue>Namespace</>: ')), '\\');
-		$output->writeln('');
+		
+		$hasNamespace = function (string $namespace): bool {
+			$composerFile = getcwd() . '/composer.json';
+			if (file_exists($composerFile)) {
+				$composerJson = json_decode(file_get_contents($composerFile));
+				foreach ($composerJson->{'autoload'}->{'psr-4'} as $ns => $dir) {
+					if (Strings::startsWith($namespace, $ns)) {
+						return true;
+					}
+				}
+			}
 
+			return false;
+		};
+
+		$output->writeln('');
+		
+		if (!$hasNamespace($namespace)) {
+			$output->writeln('<error>Error! Cannot resolve composer psr-4 namespace ' . $namespace . '!</error>');
+			$output->writeln('');
+			return 1;
+		}
+		
 		/** @var DoctrineEntityProperty[] $properties */
 		$properties = [];
 
@@ -258,16 +281,27 @@ class CreateModelCommand extends BaseCommand
 			$traits
 		);
 
+		/**
+		 * @throws Exception
+		 */
 		$filePath = function (string $namespace): string {
-			$path = str_replace('\\', '/', $namespace);
-			$path = substr($path, strlen(explode('/', $path)[0]));
-			$path = $this->config->appDir . $path . '.php';
+			$composerFile = getcwd() . '/composer.json';
+			if (file_exists($composerFile)) {
+				$composerJson = json_decode(file_get_contents($composerFile));
+				foreach ($composerJson->{'autoload'}->{'psr-4'} as $ns => $dir) {
+					if (Strings::startsWith($namespace, $ns)) {
+						$path = $dir . '/' . str_replace('\\', '/', substr($namespace, strlen($ns))) . '.php';
 
-			if (!file_exists($directory = dirname($path))) {
-				@mkdir($directory, 0777, true);
+						if (!file_exists($directory = dirname($path))) {
+							@mkdir($directory, 0777, true);
+						}
+						
+						return $path;
+					}
+				}
 			}
-
-			return $path;
+			
+			throw new Exception('Cannot resolve psr-4 namespace for ' . $namespace);
 		};
 
 		$eventMap = [];
