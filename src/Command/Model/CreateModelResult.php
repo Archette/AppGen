@@ -15,8 +15,8 @@ class CreateModelResult
 	private bool $createEditMethod;
 	private bool $createDeleteMethod;
 	private bool $createSoftDeleteMethod;
-	private array $events = [];
-	private array $traits = [];
+	private array $events;
+	private array $traits;
 
 	/** @var DoctrineEntityProperty[] */
 	private array $getByMethods = [];
