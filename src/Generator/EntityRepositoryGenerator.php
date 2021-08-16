@@ -34,7 +34,6 @@ class EntityRepositoryGenerator
 			$namespace->addUse('DateTime');
 		}
 		$namespace->addUse('Doctrine\ORM\EntityManagerInterface');
-		$namespace->addUse('Doctrine\ORM\EntityRepository');
 		$namespace->addUse('Doctrine\ORM\QueryBuilder');
 		if (Strings::contains($this->config->model->entity->idType, 'uuid')) {
 			$namespace->addUse('Ramsey\Uuid\UuidInterface');
